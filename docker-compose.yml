@@ -30,7 +30,10 @@ services:
  postgres:
    restart: always
    image: postgres:latest
+   volumes:
+     - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
    environment:
      POSTGRES_PASSWORD: linode123
+     POSTGRES_DB: linode
    expose:
      - "5432"

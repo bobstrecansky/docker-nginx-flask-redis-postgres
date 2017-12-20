@@ -2,7 +2,7 @@ version: '3'
 services:
  flaskapp:
    build: ./web
-   restart: always
+   restart: on-failure
    expose:
      - "8000"
    volumes:
@@ -18,18 +18,18 @@ services:
 
  redis:
    image: redis:alpine
-   restart: always
+   restart: on-failure
 
  nginx:
    build: nginx/
-   restart: always
+   restart: on-failure
    ports:
      - "80:80"
    depends_on:
      - flaskapp
 
  postgres:
-   restart: always
+   restart: on-failure
    image: postgres:alpine
    volumes:
      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql

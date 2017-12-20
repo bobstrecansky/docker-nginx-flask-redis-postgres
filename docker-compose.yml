@@ -17,7 +17,7 @@ services:
      FLASK_DEBUG: 1
 
  redis:
-   image: redis:latest
+   image: redis:alpine
 
  nginx:
    build: nginx/
@@ -29,7 +29,7 @@ services:
 
  postgres:
    restart: always
-   image: postgres:latest
+   image: postgres:alpine
    volumes:
      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
      - ./postgres/data:/var/lib/postgresql/data

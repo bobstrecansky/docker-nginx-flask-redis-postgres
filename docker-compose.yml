@@ -18,6 +18,7 @@ services:
 
  redis:
    image: redis:alpine
+   restart: always
 
  nginx:
    build: nginx/

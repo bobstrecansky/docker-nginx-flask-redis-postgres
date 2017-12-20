@@ -32,6 +32,7 @@ services:
    image: postgres:latest
    volumes:
      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+     - ./postgres/data:/var/lib/postgresql/data
    environment:
      POSTGRES_PASSWORD: linode123
      POSTGRES_DB: linode

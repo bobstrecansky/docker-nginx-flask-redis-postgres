@@ -1,0 +1,36 @@
+version: '3'
+services:
+ flaskapp:
+   build: ./web
+   restart: always
+   expose:
+     - "8000"
+   volumes:
+     - ./web:/home/flask/app/web
+   depends_on:
+     - redis
+     - postgres
+   links:
+     - redis
+     - postgres
+   environment:
+     FLASK_DEBUG: 1
+
+ redis:
+   image: redis:latest
+
+ nginx:
+   build: nginx/
+   restart: always
+   ports:
+     - "80:80"
+   depends_on:
+     - flaskapp
+
+ postgres:
+   restart: always
+   image: postgres:latest
+   environment:
+     POSTGRES_PASSWORD: linode123
+   expose:
+     - "5432"

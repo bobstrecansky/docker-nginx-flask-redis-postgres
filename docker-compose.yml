@@ -1,41 +1,89 @@
+# docker-compose version : the latest and recommended version, cross compatible between compose and Docker Engine's swarm mode
 version: '3'
+
+# services : define the services that are going to be instantiated with docker-compose
 services:
+
+ # defining our flask web application
  flaskapp:
+
+   # build the Dockerfile that is in the web directory: http://bit.ly/2BpBPXq
    build: ./web
-   restart: on-failure
+
+   # always restart the container regardless of the exit status; try and restart the container indefinitely
+   restart: always
+
+   # expose port 8000 to other containers (not to the host of the machine
    expose:
      - "8000"
+
+   # mount the web directory (http://bit.ly/2BbJO6k) within the container at /home/flask/app/web
    volumes:
      - ./web:/home/flask/app/web
+
+   # don't create this container until the redis and postgres containers (below) have been created
    depends_on:
      - redis
      - postgres
+
+   # link the redis and postgres containers together so that they can talk to one another
    links:
      - redis
      - postgres
+
+   # pass environment variables to the flask container (this debug lets us see more useful information)
    environment:
      FLASK_DEBUG: 1
 
- redis:
-   image: redis:alpine
-   restart: on-failure
+   # deploy with 3 replicas in the case of failure of one of the containers
+   deploy:
+     mode: replicated
+     replicas: 3
 
+ # defining the redis docker container for our web application
+ redis:
+
+   # use the redis:alpine image: https://hub.docker.com/_/redis/
+   image: redis:alpine
+   restart: always
+   deploy:
+     mode: replicated
+     replicas: 3
+
+ # defining the redis NGINX forward proxy container for our web application
  nginx:
+
+   # build the nginx Dockerfile: http://bit.ly/2kuYaIv
    build: nginx/
-   restart: on-failure
+   restart: always
+
+   # Expose port 80 to the host machine
    ports:
      - "80:80"
+   deploy:
+     mode: replicated
+     replicas: 3
+
+   # Our flask application needs to be available for NGINX to make successful proxy requests
    depends_on:
      - flaskapp
 
+ # defining our postgres database for our web application
  postgres:
-   restart: on-failure
+   restart: always
+   # use the postgres alpine image: https://hub.docker.com/_/postgres/
    image: postgres:alpine
+
+   # Mount an initialization script and the persistent postgresql data volume
    volumes:
      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
      - ./postgres/data:/var/lib/postgresql/data
+
+   # Pass postgres environment variables
    environment:
      POSTGRES_PASSWORD: linode123
      POSTGRES_DB: linode
+
+   # Expose port 5432 to other docker containers
    expose:
      - "5432"

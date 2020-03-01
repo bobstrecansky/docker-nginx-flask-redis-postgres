@@ -1,4 +1,4 @@
-from python:3.6.2-slim
+from python:slim
 RUN groupadd flaskgroup && useradd -m -g flaskgroup -s /bin/bash flask
 RUN echo "flask ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 RUN mkdir -p /home/flask/app/web
